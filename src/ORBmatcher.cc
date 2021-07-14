@@ -576,6 +576,7 @@ int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f
     vnMatches12 = vector<int>(F1.mvKeysUn.size(),-1);
 
     // Step 1 构建旋转直方图，HISTO_LENGTH = 30
+    //这里定义一个二维数组，数组rotHist中每个元素都是个vector<int>，也就是每个元素都是个int型数组，
     vector<int> rotHist[HISTO_LENGTH];
     for(int i=0;i<HISTO_LENGTH;i++)
     // 每个bin里预分配500个，因为使用的是vector不够的话可以自动扩展容量
@@ -644,7 +645,7 @@ int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f
         {
             // 最佳距离比次佳距离要小于设定的比例，这样特征点辨识度更高
             if(bestDist<(float)bestDist2*mfNNratio)
-            {
+            { 
                 // 如果找到的候选特征点对应F1中特征点已经匹配过了，说明发生了重复匹配，将原来的匹配也删掉
                 if(vnMatches21[bestIdx2]>=0)
                 {

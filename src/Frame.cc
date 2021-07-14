@@ -320,6 +320,8 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
 
     // Step 2 计算图像金字塔的参数 
     // Scale Level Info
+    //  获取金字塔的一些属性
+
 	//获取图像金字塔的层数
     mnScaleLevels = mpORBextractorLeft->GetLevels();
 	//获取每层的缩放因子
@@ -656,6 +658,7 @@ vector<size_t> Frame::GetFeaturesInArea(const float &x, const float  &y, const f
                 }               
 
                 // 通过检查，计算候选特征点到圆中心的距离，查看是否是在这个圆形区域之内
+                //这里是不是只能保证在一个矩形区域内而不一定在圆形区域内？
                 const float distx = kpUn.pt.x-x;
                 const float disty = kpUn.pt.y-y;
 
@@ -863,6 +866,9 @@ void Frame::ComputeStereoMatches()
     const int Nr = mvKeysRight.size();
 
 	// Step 1. 行特征点统计. 考虑到尺度金字塔特征，一个特征点可能存在于多行，而非唯一的一行
+    //这里考虑金字塔的特征应该指的是比如在第n层提到了某个特征点最后转换坐标到第0层时经过缩放系数作用后做了四舍五入的操作会有误差
+    //相当于某个特征点行号是100，但实际上我们把它push到了100上下一个范围的几行中(认为它有可能出现在这几行)
+    //
     for(int iR = 0; iR < Nr; iR++) {
 
         // 获取特征点ir的y坐标，即行号
@@ -963,7 +969,7 @@ void Frame::ComputeStereoMatches()
             // w表示sad相似度的窗口半径
             const int w = 5;
 
-            // 提取左图中，以特征点(scaleduL,scaledvL)为中心, 半径为w的图像快patch
+            // 提取左图中，以特征点(scaleduL,scaledvL)为中心, 半径为w的图像块patch
             cv::Mat IL = mpORBextractorLeft->mvImagePyramid[kpL.octave].rowRange(scaledvL-w,scaledvL+w+1).colRange(scaleduL-w,scaleduL+w+1);
             IL.convertTo(IL,CV_32F);
             
@@ -998,7 +1004,7 @@ void Frame::ComputeStereoMatches()
 			// 在搜索范围内从左到右滑动，并计算图像块相似度
             for(int incR=-L; incR<=+L; incR++) {
 
-                // 提取左图中，以特征点(scaleduL,scaledvL)为中心, 半径为w的图像快patch
+                // 提取右图中，以特征点(scaleduL,scaledvL)为中心, 半径为w的图像快patch
                 cv::Mat IR = mpORBextractorRight->mvImagePyramid[kpL.octave].rowRange(scaledvL-w,scaledvL+w+1).colRange(scaleduR0+incR-w,scaleduR0+incR+w+1);
                 IR.convertTo(IR,CV_32F);
                 
@@ -1019,11 +1025,12 @@ void Frame::ComputeStereoMatches()
             }
 
             // 搜索窗口越界判断
+            //因为滑动窗口是个开区间？
             if(bestincR==-L || bestincR==L)
                 continue;
 
 			// Step 4. 亚像素插值, 使用最佳匹配点及其左右相邻点构成抛物线
-            // 使用3点拟合抛物线的方式，用极小值代替之前计算的最优是差值
+            // 使用3点拟合抛物线的方式，用极小值代替之前计算的最优视差值
             //    \                 / <- 由视差为14，15，16的相似度拟合的抛物线
             //      .             .(16)
             //         .14     .(15) <- int/uchar最佳视差值
@@ -1044,6 +1051,7 @@ void Frame::ComputeStereoMatches()
             
             // 根据亚像素精度偏移量delta调整最佳匹配索引
             float bestuR = mvScaleFactors[kpL.octave]*((float)scaleduR0+(float)bestincR+deltaR);
+            //计算视差  uL 左目特征点x坐标(第0层)，bestuR
             float disparity = (uL-bestuR);
             if(disparity>=minD && disparity<maxD) {
                 // 如果存在负视差，则约束为0.01

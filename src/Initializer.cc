@@ -140,6 +140,8 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
     // Step 2 在所有匹配特征点对中随机选择8对匹配特征点为一组，用于估计H矩阵和F矩阵
     // 共选择 mMaxIterations (默认200) 组
     //mvSets用于保存每次迭代时所使用的向量
+
+    //这里可以参考Ipad做的笔记
     mvSets = vector< vector<size_t> >(mMaxIterations,		//最大的RANSAC迭代次数
 									  vector<size_t>(8,0));	//这个则是第二维元素的初始值，也就是第一维。这里其实也是一个第一维的构造函数，第一维vector有8项，每项的初始值为0.
 
@@ -291,6 +293,7 @@ void Initializer::FindHomography(vector<bool> &vbMatchesInliers, float &score, c
 
             // vPn1i和vPn2i为匹配的特征点对的归一化后的坐标
 			// 首先根据这个特征点对的索引信息分别找到两个特征点在各自图像特征点向量中的索引，然后读取其归一化之后的特征点坐标
+            // 该类成员 vector<Match> mvMatches12;
             vPn1i[j] = vPn1[mvMatches12[idx].first];    //first存储在参考帧1中的特征点索引
             vPn2i[j] = vPn2[mvMatches12[idx].second];   //second存储在参考帧1中的特征点索引
         }//读取8对特征点的归一化之后的坐标
@@ -1472,10 +1475,11 @@ void Initializer::Normalize(const vector<cv::KeyPoint> &vKeys, vector<cv::Point2
     // 将原始特征点减去均值坐标，使x坐标和y坐标均值分别为0
     for(int i=0; i<N; i++)
     {
+        //这里相当于去中心化
         vNormalizedPoints[i].x = vKeys[i].pt.x - meanX;
         vNormalizedPoints[i].y = vKeys[i].pt.y - meanY;
 
-		//累计这些特征点偏离横纵坐标均值的程度
+		// 的程度
         meanDevX += fabs(vNormalizedPoints[i].x);
         meanDevY += fabs(vNormalizedPoints[i].y);
     }
@@ -1499,7 +1503,7 @@ void Initializer::Normalize(const vector<cv::KeyPoint> &vKeys, vector<cv::Point2
     // |sX  0  -meanx*sX|
     // |0   sY -meany*sY|
     // |0   0      1    |
-    T = cv::Mat::eye(3,3,CV_32F);
+    T = cv::Mat::eye(3,3,CV_32F);  //3x3单位阵
     T.at<float>(0,0) = sX;
     T.at<float>(1,1) = sY;
     T.at<float>(0,2) = -meanX*sX;

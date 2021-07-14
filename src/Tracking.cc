@@ -47,7 +47,6 @@
 #include <cmath>
 #include <mutex>
 
-
 using namespace std;
 
 // 程序中变量名的第一个字母如果为"m"则表示为类中的成员变量，member
@@ -449,7 +448,7 @@ void Tracking::Track()
     // 回答：主要耗时在构造帧中特征点的提取和匹配部分,在那个时候地图是没有被上锁的,有足够的时间更新地图
     unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
 
-    // Step 1：地图初始化
+    // Step 1：初始化
     if(mState==NOT_INITIALIZED)
     {
         if(mSensor==System::STEREO || mSensor==System::RGBD)
@@ -889,7 +888,7 @@ void Tracking::MonocularInitialization()
             // mvbPrevMatched  记录"上一帧"所有特征点
             mvbPrevMatched.resize(mCurrentFrame.mvKeysUn.size());
             for(size_t i=0; i<mCurrentFrame.mvKeysUn.size(); i++)
-                mvbPrevMatched[i]=mCurrentFrame.mvKeysUn[i].pt;
+                mvbPrevMatched[i]=mCurrentFrame.mvKeysUn[i].pt; //当前帧去畸变后特征点的坐标
 
             // 删除前判断一下，来避免出现段错误。不过在这里是多余的判断
             // 不过在这里是多余的判断，因为前面已经判断过了
@@ -944,6 +943,7 @@ void Tracking::MonocularInitialization()
 
         cv::Mat Rcw; // Current Camera Rotation
         cv::Mat tcw; // Current Camera Translation
+        //记录特征点是否被成功三角化(成地图点)
         vector<bool> vbTriangulated; // Triangulated Correspondences (mvIniMatches)
 
         // Step 5 通过H模型或F模型进行单目初始化，得到两帧间相对运动、初始MapPoints
@@ -1153,7 +1153,7 @@ void Tracking::CheckReplacedInLastFrame()
  * 
  * Step 1：将当前普通帧的描述子转化为BoW向量
  * Step 2：通过词袋BoW加速当前帧与参考帧之间的特征点匹配
- * Step 3: 将上一帧的位姿态作为当前帧位姿的初始值
+ * Step 3: 将上一帧的位姿态作为当前帧位姿的初始值0
  * Step 4: 通过优化3D-2D的重投影误差来获得位姿
  * Step 5：剔除优化后的匹配点中的外点
  * @return 如果匹配数超10，返回true
