@@ -672,6 +672,7 @@ int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f
                     // 如果bin 满了又是一个轮回
                     if(bin==HISTO_LENGTH)
                         bin=0;
+                    // assert()  如果其值为假（即为0），打印一条出错信息,然后通过调用 abort 来终止程序运行。
                     assert(bin>=0 && bin<HISTO_LENGTH);
                     rotHist[bin].push_back(i1);
                 }

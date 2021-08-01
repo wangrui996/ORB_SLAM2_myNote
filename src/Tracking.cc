@@ -912,6 +912,7 @@ void Tracking::MonocularInitialization()
         if((int)mCurrentFrame.mvKeys.size()<=100)
         {
             delete mpInitializer;
+            //!注意delete后给它置为空指针
             mpInitializer = static_cast<Initializer*>(NULL);
             fill(mvIniMatches.begin(),mvIniMatches.end(),-1);
             return;
@@ -919,6 +920,7 @@ void Tracking::MonocularInitialization()
 
         // Find correspondences
         // Step 3 在mInitialFrame与mCurrentFrame中找匹配的特征点对
+        // 能到这里说明有连续的两帧提取到的特征点数超过100
         ORBmatcher matcher(
             0.9,        //最佳的和次佳特征点评分的比值阈值，这里是比较宽松的，跟踪时一般是0.7
             true);      //检查特征点的方向
