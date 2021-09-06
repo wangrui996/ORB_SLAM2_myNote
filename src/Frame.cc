@@ -464,7 +464,7 @@ void Frame::UpdatePoseMatrices()
 	//从变换矩阵中提取出旋转矩阵
     //注意，rowRange这个只取到范围的左边界，而不取右边界
     mRcw = mTcw.rowRange(0,3).colRange(0,3);
-
+h
     // mRcw求逆即可
     mRwc = mRcw.t();
 

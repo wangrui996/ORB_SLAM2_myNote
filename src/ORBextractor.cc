@@ -1213,7 +1213,7 @@ void ORBextractor::ComputeKeyPointsOld(
         const int nDesiredFeatures = mnFeaturesPerLevel[level];
 
 		//计算当前图层中应该有几行cell和几行row
-		//NOTICE 其实下面都应该注意的是最好是使用显式强制转换或者直接使用取整函数。经过查阅资料，发现下面的浮点型数据到整型数据的转换规则
+		//NOTICE 其实下面都应该注意的是最好是使用显式强制转换或者直接使用取整函数。经过查阅资料，发现下面的浮数据点型数据到整型的转换规则
 		//是直接保留浮点数据的整数部分
 		//TODO 不解，为什么是这样子计算本层图像中图像cell的行数和列数。而且这个数目和希望提取的特征点个数有关
         const int levelCols = sqrt((float)nDesiredFeatures/(5*imageRatio));

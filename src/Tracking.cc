@@ -959,7 +959,7 @@ void Tracking::MonocularInitialization()
             // Step 6 初始化成功后，删除那些无法进行三角化的匹配点
             for(size_t i=0, iend=mvIniMatches.size(); i<iend;i++)
             {
-                if(mvIniMatches[i]>=0 && !vbTriangulated[i])
+                if(mvIniMatches[i]>=0 && !vbTriangulated[i]) //大于等于0是表示有匹配关系，第二个是没有成功三角化
                 {
                     mvIniMatches[i]=-1;
                     nmatches--;

@@ -391,7 +391,7 @@ void MapPoint::ComputeDistinctiveDescriptors()
 
         if(!pKF->isBad())        
             // 取对应的描述子向量                                               
-            vDescriptors.push_back(pKF->mDescriptors.row(mit->second));     
+            vDescriptors.push_back(pKF-mDescriptors>.row(mit->second));     
     }
 
     if(vDescriptors.empty())
@@ -510,7 +510,7 @@ void MapPoint::UpdateNormalAndDepth()
         return;
 
     // Step 2 计算该地图点的平均观测方向
-    // 能观测到该地图点的所有关键帧，对该点的观测方向归一化为单位向量，然后进行求和得到该地图点的朝向
+    //  后进行求和得到该地图点的朝向
     // 初始值为0向量，累加为归一化向量，最后除以总数n
     cv::Mat normal = cv::Mat::zeros(3,1,CV_32F);
     int n=0;

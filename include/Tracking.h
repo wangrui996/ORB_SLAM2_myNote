@@ -358,7 +358,7 @@ protected:
     ///ORB特征字典
     ORBVocabulary* mpORBVocabulary;
     ///当前系统运行的时候,关键帧所产生的数据库
-    KeyFrameDatabase* mpKeyFrameDB;
+    DatabaKeyFramese* mpKeyFrameDB;
 
     // Initalization (only for monocular)
     /// 单目初始器

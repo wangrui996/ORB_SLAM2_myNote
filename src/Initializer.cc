@@ -449,7 +449,7 @@ cv::Mat Initializer::ComputeH21(
 
 	//获取参与计算的特征点的数目
     const int N = vP1.size();
-
+    
     // 构造用于计算的矩阵 A 
     cv::Mat A(2*N,				//行，注意每一个点的数据对应两行
 			  9,				//列
@@ -503,6 +503,7 @@ cv::Mat Initializer::ComputeH21(
     // 注意前面说的是右奇异值矩阵的最后一列，但是在这里因为是vt，转置后了，所以是行；由于A有9列数据，故最后一列的下标为8
     return vt.row(8).reshape(0, 			//转换后的通道数，这里设置为0表示是与前面相同
 							 3); 			//转换后的行数,对应V的最后一列
+    //!这里reshape成一个3行的矩阵，本来vt.row(8)是9x1，这里reshape成3行也就是3x3的H矩阵
 }
 
 
@@ -533,6 +534,7 @@ cv::Mat Initializer::ComputeF21(
 
     // 构造矩阵A，将每个特征点添加到矩阵A中的元素
     for(int i=0; i<N; i++)
+
     {
         const float u1 = vP1[i].x;
         const float v1 = vP1[i].y;
@@ -1130,7 +1132,7 @@ bool Initializer::ReconstructH(vector<bool> &vbMatchesInliers, cv::Mat &H21, cv:
     vt.reserve(8);
     vn.reserve(8);
 
-    // Step 1.1 讨论 d' > 0 时的 4 组解
+    // ?Step 1.1 讨论 d' > 0 时的 4 组解
     // 根据论文eq.(12)有
     // x1 = e1 * sqrt((d1 * d1 - d2 * d2) / (d1 * d1 - d3 * d3))
     // x2 = 0
@@ -1402,6 +1404,7 @@ void Initializer::Triangulate(
 
 	//这个就是上面注释中的矩阵A
     cv::Mat A(4,4,CV_32F);
+    
 
 	//构造参数矩阵A
     A.row(0) = kp1.pt.x*P1.row(2)-P1.row(0);
@@ -1442,6 +1445,7 @@ void Initializer::Triangulate(
  * @param[in & out] vNormalizedPoints             特征点归一化后的坐标
  * @param[in & out] T                             归一化特征点的变换矩阵
  */
+//!如果不理解看ipad笔记
 void Initializer::Normalize(const vector<cv::KeyPoint> &vKeys, vector<cv::Point2f> &vNormalizedPoints, cv::Mat &T)                           //将特征点归一化的矩阵
 {
     // 归一化的是这些点在x方向和在y方向上的一阶绝对矩（随机变量的期望）。
